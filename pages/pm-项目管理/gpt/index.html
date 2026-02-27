@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>团队项目管理原型</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div class="title">团队项目管理</div>
+            <div class="subtitle">面向 10–30 人互联网团队的轻量看板原型</div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="btn" id="btn-new-task" type="button">新建任务</button>
+          <button class="btn btn-secondary" id="btn-new-member" type="button">添加成员</button>
+          <button class="btn btn-ghost" id="btn-reset" type="button" title="清空本地数据并恢复 Demo">重置 Demo</button>
+        </div>
+      </header>
+
+      <main class="content">
+        <aside class="sidebar" aria-label="团队成员">
+          <div class="sidebar-header">
+            <div class="sidebar-title">团队成员</div>
+            <div class="sidebar-meta" id="member-count"></div>
+          </div>
+          <div class="member-list" id="member-list"></div>
+          <div class="hint">
+            提示：删除成员后，其负责的任务会自动变为“未分配”。
+          </div>
+        </aside>
+
+        <section class="board" aria-label="项目看板">
+          <div class="board-grid" id="board"></div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-backdrop" id="modal-backdrop" hidden></div>
+
+    <div class="modal" id="task-modal" role="dialog" aria-modal="true" aria-labelledby="task-modal-title" hidden>
+      <div class="modal-header">
+        <div class="modal-title" id="task-modal-title">任务详情</div>
+        <button class="icon-btn" id="task-modal-close" type="button" aria-label="关闭">
+          ✕
+        </button>
+      </div>
+      <form class="modal-body" id="task-form">
+        <input type="hidden" name="id" />
+
+        <label class="field">
+          <div class="label">标题</div>
+          <input class="input" name="title" type="text" placeholder="例如：对齐需求并拆分任务" required />
+        </label>
+
+        <label class="field">
+          <div class="label">描述</div>
+          <textarea class="textarea" name="description" rows="4" placeholder="补充背景、验收标准、相关链接…"></textarea>
+        </label>
+
+        <div class="row">
+          <label class="field">
+            <div class="label">负责人</div>
+            <select class="select" name="assigneeId" id="assignee-select"></select>
+          </label>
+
+          <label class="field">
+            <div class="label">截止日期</div>
+            <input class="input" name="dueDate" type="date" />
+          </label>
+        </div>
+
+        <div class="row">
+          <label class="field">
+            <div class="label">优先级</div>
+            <select class="select" name="priority">
+              <option value="low">低</option>
+              <option value="medium">中</option>
+              <option value="high">高</option>
+              <option value="urgent">紧急</option>
+            </select>
+          </label>
+
+          <label class="field">
+            <div class="label">状态</div>
+            <select class="select" name="status">
+              <option value="todo">待办</option>
+              <option value="doing">进行中</option>
+              <option value="done">已完成</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-danger btn-ghost" id="btn-delete-task" type="button">删除</button>
+          <div class="spacer"></div>
+          <button class="btn btn-secondary" id="btn-cancel-task" type="button">取消</button>
+          <button class="btn" type="submit">保存</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="modal" id="member-modal" role="dialog" aria-modal="true" aria-labelledby="member-modal-title" hidden>
+      <div class="modal-header">
+        <div class="modal-title" id="member-modal-title">添加成员</div>
+        <button class="icon-btn" id="member-modal-close" type="button" aria-label="关闭">
+          ✕
+        </button>
+      </div>
+      <form class="modal-body" id="member-form">
+        <input type="hidden" name="id" />
+        <label class="field">
+          <div class="label">姓名</div>
+          <input class="input" name="name" type="text" placeholder="例如：李雷" required />
+        </label>
+        <label class="field">
+          <div class="label">角色</div>
+          <select class="select" name="role">
+            <option value="PM">PM</option>
+            <option value="Dev">开发</option>
+            <option value="Design">设计</option>
+            <option value="QA">测试</option>
+            <option value="Ops">运维</option>
+          </select>
+        </label>
+
+        <div class="modal-footer">
+          <button class="btn btn-danger btn-ghost" id="btn-delete-member" type="button" hidden>删除成员</button>
+          <div class="spacer"></div>
+          <button class="btn btn-secondary" id="btn-cancel-member" type="button">取消</button>
+          <button class="btn" type="submit">保存</button>
+        </div>
+      </form>
+    </div>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
+

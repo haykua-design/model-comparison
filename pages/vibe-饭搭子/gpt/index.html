@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>饭搭子 - 网页预览（本地 Mock）</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app">
+      <header class="topbar">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <div class="title">饭搭子</div>
+            <div class="subtitle">30 分钟凑个饭局，不尴尬也不硬社交</div>
+          </div>
+        </div>
+        <nav class="tabs" aria-label="导航">
+          <a class="tab" href="#/feed" data-tab="feed">附近</a>
+          <a class="tab" href="#/profile" data-tab="profile">我的</a>
+        </nav>
+      </header>
+
+      <main class="content">
+        <div id="root"></div>
+      </main>
+    </div>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>
+

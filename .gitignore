@@ -1,0 +1,4 @@
+node_modules/
+.DS_Store
+*.log
+start-all.sh

@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pomodoro Timer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.8s ease;
+  }
+
+  body.work-mode {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+
+  body.rest-mode {
+    background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+  }
+
+  body.idle-mode {
+    background: linear-gradient(135deg, #B8D3E8, #E8D6C4, #F5E6D3);
+  }
+
+  .container {
+    width: 400px;
+    padding: 40px 32px;
+    border-radius: 32px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1.5px solid rgba(255, 255, 255, 0.4);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(to bottom, rgba(255,255,255,0.3), transparent);
+    border-radius: 32px 32px 0 0;
+    pointer-events: none;
+  }
+
+  .mode-label {
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 8px;
+    position: relative;
+  }
+
+  .timer-ring {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin: 20px auto;
+  }
+
+  .timer-ring svg {
+    transform: rotate(-90deg);
+    width: 220px;
+    height: 220px;
+  }
+
+  .timer-ring .track {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.15);
+    stroke-width: 6;
+  }
+
+  .timer-ring .progress {
+    fill: none;
+    stroke: rgba(255, 255, 255, 0.9);
+    stroke-width: 6;
+    stroke-linecap: round;
+    stroke-dasharray: 628.3;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.5s ease;
+  }
+
+  .timer-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 56px;
+    font-weight: 300;
+    color: white;
+    letter-spacing: 2px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .controls {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    margin: 24px 0 20px;
+    position: relative;
+  }
+
+  .btn {
+    border: none;
+    border-radius: 16px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(10px);
+    font-family: inherit;
+  }
+
+  .btn:active { transform: scale(0.96); }
+
+  .btn-primary {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  }
+
+  .btn-primary:hover {
+    background: white;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-secondary {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .settings {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    position: relative;
+  }
+
+  .setting-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .setting-group label {
+    font-size: 12px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.7);
+    letter-spacing: 1px;
+  }
+
+  .time-adjuster {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .time-adjuster button {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    font-family: inherit;
+  }
+
+  .time-adjuster button:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .time-adjuster button:active {
+    transform: scale(0.92);
+  }
+
+  .time-adjuster span {
+    font-size: 20px;
+    font-weight: 500;
+    color: white;
+    min-width: 36px;
+    text-align: center;
+  }
+
+  .session-dots {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 20px;
+    position: relative;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.25);
+    transition: all 0.3s ease;
+  }
+
+  .dot.completed {
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
+  }
+
+  .dot.current {
+    background: rgba(255, 255, 255, 0.6);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 0.6; }
+    50% { transform: scale(1.3); opacity: 1; }
+  }
+
+  .settings-toggle {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 12px;
+    border: none;
+    background: rgba(255, 255, 255, 0.15);
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 1;
+  }
+
+  .settings-toggle:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .settings-panel {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, margin 0.4s ease, opacity 0.3s ease;
+    margin-top: 0;
+    opacity: 0;
+  }
+
+  .settings-panel.open {
+    max-height: 160px;
+    margin-top: 20px;
+    opacity: 1;
+  }
+
+  @media (max-width: 440px) {
+    .container {
+      width: 92vw;
+      padding: 32px 20px;
+    }
+    .timer-display { font-size: 48px; }
+  }
+</style>
+</head>
+<body class="idle-mode">
+
+<div class="container">
+  <button class="settings-toggle" onclick="toggleSettings()" title="Settings">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <circle cx="12" cy="12" r="3"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/>
+    </svg>
+  </button>
+
+  <div class="mode-label" id="modeLabel">READY</div>
+
+  <div class="timer-ring">
+    <svg viewBox="0 0 220 220">
+      <circle class="track" cx="110" cy="110" r="100"/>
+      <circle class="progress" id="progressRing" cx="110" cy="110" r="100"/>
+    </svg>
+    <div class="timer-display" id="timerDisplay">25:00</div>
+  </div>
+
+  <div class="controls">
+    <button class="btn btn-primary" id="startBtn" onclick="toggleTimer()">Start</button>
+    <button class="btn btn-secondary" id="resetBtn" onclick="resetTimer()">Reset</button>
+  </div>
+
+  <div class="settings-panel" id="settingsPanel">
+    <div class="settings">
+      <div class="setting-group">
+        <label>WORK (min)</label>
+        <div class="time-adjuster">
+          <button onclick="adjust('work', -5)">−</button>
+          <span id="workMin">25</span>
+          <button onclick="adjust('work', 5)">+</button>
+        </div>
+      </div>
+      <div class="setting-group">
+        <label>REST (min)</label>
+        <div class="time-adjuster">
+          <button onclick="adjust('rest', -1)">−</button>
+          <span id="restMin">5</span>
+          <button onclick="adjust('rest', 1)">+</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="session-dots" id="sessionDots">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+  </div>
+</div>
+
+<script>
+  // Audio context for notification sound
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+
+  function playNotification() {
+    try {
+      const ctx = new AudioCtx();
+      const notes = [523.25, 659.25, 783.99, 1046.50];
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(0.15, ctx.currentTime + i * 0.15);
+        gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * 0.15 + 0.4);
+        osc.start(ctx.currentTime + i * 0.15);
+        osc.stop(ctx.currentTime + i * 0.15 + 0.4);
+      });
+    } catch(e) {}
+  }
+
+  // State
+  let workMinutes = 25;
+  let restMinutes = 5;
+  let totalSeconds = workMinutes * 60;
+  let remainingSeconds = totalSeconds;
+  let isRunning = false;
+  let isWorkMode = true;
+  let intervalId = null;
+  let completedSessions = 0;
+
+  const CIRCUMFERENCE = 2 * Math.PI * 100; // 628.3
+
+  // DOM elements
+  const timerDisplay = document.getElementById('timerDisplay');
+  const progressRing = document.getElementById('progressRing');
+  const startBtn = document.getElementById('startBtn');
+  const modeLabel = document.getElementById('modeLabel');
+
+  // Request notification permission
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission();
+  }
+
+  function updateDisplay() {
+    const min = Math.floor(remainingSeconds / 60);
+    const sec = remainingSeconds % 60;
+    timerDisplay.textContent = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+
+    const progress = 1 - (remainingSeconds / totalSeconds);
+    progressRing.style.strokeDasharray = CIRCUMFERENCE;
+    progressRing.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+  }
+
+  function updateMode() {
+    const body = document.body;
+    body.classList.remove('work-mode', 'rest-mode', 'idle-mode');
+
+    if (!isRunning && remainingSeconds === totalSeconds) {
+      body.classList.add('idle-mode');
+      modeLabel.textContent = 'READY';
+    } else if (isWorkMode) {
+      body.classList.add('work-mode');
+      modeLabel.textContent = 'FOCUS';
+    } else {
+      body.classList.add('rest-mode');
+      modeLabel.textContent = 'REST';
+    }
+  }
+
+  function updateDots() {
+    const dots = document.querySelectorAll('.dot');
+    dots.forEach((dot, i) => {
+      dot.classList.remove('completed', 'current');
+      if (i < completedSessions) {
+        dot.classList.add('completed');
+      } else if (i === completedSessions && isRunning) {
+        dot.classList.add('current');
+      }
+    });
+  }
+
+  function toggleTimer() {
+    if (isRunning) {
+      clearInterval(intervalId);
+      isRunning = false;
+      startBtn.textContent = 'Resume';
+    } else {
+      isRunning = true;
+      startBtn.textContent = 'Pause';
+      updateMode();
+      updateDots();
+      intervalId = setInterval(tick, 1000);
+    }
+  }
+
+  function tick() {
+    remainingSeconds--;
+    if (remainingSeconds < 0) {
+      clearInterval(intervalId);
+      isRunning = false;
+
+      playNotification();
+
+      if (isWorkMode) {
+        completedSessions = Math.min(completedSessions + 1, 4);
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('Break Time!', { body: `Nice work! Take a ${restMinutes} min break.`, icon: '🍅' });
+        }
+        isWorkMode = false;
+        totalSeconds = restMinutes * 60;
+      } else {
+        if ('Notification' in window && Notification.permission === 'granted') {
+          new Notification('Back to Work!', { body: `Break over. Let's focus for ${workMinutes} min!`, icon: '🔥' });
+        }
+        isWorkMode = true;
+        totalSeconds = workMinutes * 60;
+      }
+
+      remainingSeconds = totalSeconds;
+      startBtn.textContent = 'Start';
+      updateMode();
+      updateDots();
+      updateDisplay();
+
+      if (completedSessions >= 4) {
+        completedSessions = 0;
+        updateDots();
+      }
+      return;
+    }
+    updateDisplay();
+  }
+
+  function resetTimer() {
+    clearInterval(intervalId);
+    isRunning = false;
+    isWorkMode = true;
+    totalSeconds = workMinutes * 60;
+    remainingSeconds = totalSeconds;
+    startBtn.textContent = 'Start';
+    document.body.classList.remove('work-mode', 'rest-mode', 'idle-mode');
+    document.body.classList.add('idle-mode');
+    modeLabel.textContent = 'READY';
+    progressRing.style.strokeDashoffset = 0;
+    updateDisplay();
+    updateDots();
+  }
+
+  function adjust(type, delta) {
+    if (isRunning) return;
+    if (type === 'work') {
+      workMinutes = Math.max(5, Math.min(60, workMinutes + delta));
+      document.getElementById('workMin').textContent = workMinutes;
+      if (isWorkMode) {
+        totalSeconds = workMinutes * 60;
+        remainingSeconds = totalSeconds;
+      }
+    } else {
+      restMinutes = Math.max(1, Math.min(30, restMinutes + delta));
+      document.getElementById('restMin').textContent = restMinutes;
+      if (!isWorkMode) {
+        totalSeconds = restMinutes * 60;
+        remainingSeconds = totalSeconds;
+      }
+    }
+    updateDisplay();
+  }
+
+  function toggleSettings() {
+    document.getElementById('settingsPanel').classList.toggle('open');
+  }
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space') { e.preventDefault(); toggleTimer(); }
+    if (e.code === 'KeyR') { resetTimer(); }
+  });
+
+  // Init
+  progressRing.style.strokeDasharray = CIRCUMFERENCE;
+  progressRing.style.strokeDashoffset = 0;
+  updateDisplay();
+</script>
+
+</body>
+</html>

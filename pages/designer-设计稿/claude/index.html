@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>阿那亚漫游</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --bg: #FAF5EF;
+    --card-plan: #EDE3D4;
+    --card-plan-pill: #DDD2C0;
+    --card-plan-pill-checked: #D4C9B5;
+    --card-tickets: #DEE8F3;
+    --card-tickets-icon: #C8D8EA;
+    --text-primary: #1A1A1A;
+    --text-secondary: #999;
+    --text-tertiary: #BBB;
+    --item-bg: rgba(255, 255, 255, 0.5);
+    --item-border: rgba(0, 0, 0, 0.04);
+    --divider: rgba(0, 0, 0, 0.05);
+    --btn-bg: rgba(255, 255, 255, 0.75);
+    --bottom-bar-bg: rgba(255, 255, 255, 0.85);
+    --bottom-bar-border: rgba(0, 0, 0, 0.08);
+    --shadow: rgba(0, 0, 0, 0.06);
+    --icon-color: #888;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+    background: var(--bg);
+    color: var(--text-primary);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 430px;
+    margin: 0 auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+    position: relative;
+    padding-bottom: 100px;
+  }
+
+  /* ===== Status Bar ===== */
+  .status-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px 0;
+    height: 54px;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .status-bar-left { font-variant-numeric: tabular-nums; }
+  .status-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .status-bar-right svg { display: block; }
+
+  /* ===== Header ===== */
+  .header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 8px 20px 0;
+    gap: 10px;
+    position: relative;
+  }
+
+  .avatars {
+    display: flex;
+    align-items: center;
+  }
+  .avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 2.5px solid var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .avatar:nth-child(2) { margin-left: -12px; }
+  .avatar-1 { background: #D8E8D8; z-index: 2; }
+  .avatar-2 { background: #F0D8CC; z-index: 1; }
+
+  .header-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--btn-bg);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: background 0.15s;
+  }
+  .header-btn:active { background: rgba(0,0,0,0.08); }
+  .header-btn svg { display: block; }
+
+  /* ===== More Button Morph ===== */
+  .more-wrapper {
+    position: relative;
+    width: 40px;
+    height: 40px;
+    z-index: 100;
+  }
+
+  .menu-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 99;
+    opacity: 0;
+    pointer-events: none;
+    background: rgba(0, 0, 0, 0.01);
+    transition: opacity 200ms;
+  }
+  .menu-backdrop.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .more-morph {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 20px;
+    background: var(--btn-bg);
+    overflow: hidden;
+    cursor: pointer;
+    transition: width 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                height 300ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                border-radius 250ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                background 200ms ease,
+                box-shadow 250ms ease;
+    z-index: 101;
+  }
+  .more-morph.expanded {
+    width: 180px;
+    height: 168px;
+    border-radius: 18px;
+    background: #FFFFFF;
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.13), 0 1px 3px rgba(0,0,0,0.06);
+  }
+
+  .dots-icon {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 150ms ease;
+    pointer-events: none;
+  }
+  .more-morph.expanded .dots-icon { opacity: 0; }
+  .dots-icon span {
+    display: flex;
+    gap: 3px;
+  }
+  .dots-icon span i {
+    width: 4.5px;
+    height: 4.5px;
+    border-radius: 50%;
+    background: var(--text-primary);
+    display: block;
+  }
+
+  .menu-list {
+    position: absolute;
+    top: 12px;
+    left: 0;
+    right: 0;
+    padding: 0 6px;
+  }
+  .menu-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    border-radius: 12px;
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text-primary);
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 200ms ease, transform 200ms ease, background 0.15s;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .menu-item:active { background: rgba(0,0,0,0.04); }
+  .menu-item.delete-item { color: #E8453C; }
+  .menu-item svg { flex-shrink: 0; }
+
+  .more-morph.expanded .menu-item {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .more-morph.expanded .menu-item:nth-child(1) { transition-delay: 60ms; }
+  .more-morph.expanded .menu-item:nth-child(2) { transition-delay: 120ms; }
+  .more-morph.expanded .menu-item:nth-child(3) { transition-delay: 180ms; }
+
+  .more-morph.closing .menu-item {
+    opacity: 0;
+    transform: translateY(-4px);
+    transition-delay: 0ms !important;
+    transition-duration: 100ms !important;
+  }
+
+  /* ===== Title ===== */
+  .title {
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    padding: 20px 20px 0;
+    line-height: 1.25;
+  }
+
+  /* ===== Cards ===== */
+  .cards {
+    display: flex;
+    gap: 12px;
+    padding: 20px 20px 0;
+  }
+
+  .card {
+    flex: 1;
+    border-radius: 20px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    aspect-ratio: 1 / 0.85;
+    min-height: 0;
+  }
+
+  .card-plan { background: var(--card-plan); }
+  .card-tickets { background: var(--card-tickets); }
+
+  .card-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-primary);
+    text-align: center;
+    margin-top: auto;
+    padding-top: 8px;
+  }
+
+  .card-plan-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .plan-pill {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--card-plan-pill);
+    border-radius: 22px;
+    padding: 8px 14px;
+    height: 40px;
+  }
+  .plan-pill.checked { background: var(--card-plan-pill-checked); }
+
+  .checkbox {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid rgba(0, 0, 0, 0.2);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .checkbox.checked {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+  }
+  .checkbox.checked svg { display: block; }
+
+  .pill-line {
+    flex: 1;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.1);
+  }
+
+  /* Tickets card icon */
+  .tickets-icon-wrapper {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tickets-icon {
+    width: 72px;
+    height: 84px;
+    position: relative;
+  }
+  .ticket-doc {
+    width: 60px;
+    height: 72px;
+    background: rgba(255, 255, 255, 0.55);
+    border-radius: 8px 14px 8px 8px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 16px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .ticket-doc::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 14px;
+    height: 14px;
+    background: linear-gradient(135deg, var(--card-tickets) 50%, rgba(255,255,255,0.35) 50%);
+    border-radius: 0 14px 0 4px;
+  }
+  .ticket-line {
+    height: 2.5px;
+    border-radius: 2px;
+    background: rgba(0, 0, 0, 0.08);
+  }
+  .ticket-line:nth-child(1) { width: 70%; }
+  .ticket-line:nth-child(2) { width: 50%; }
+  .ticket-line:nth-child(3) { width: 60%; }
+
+  .ticket-doc-back {
+    width: 56px;
+    height: 68px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 8px 12px 8px 8px;
+    position: absolute;
+    top: 0;
+    right: 0;
+  }
+
+  /* ===== Sections ===== */
+  .sections {
+    padding: 24px 20px 0;
+  }
+
+  .section {
+    margin-bottom: 0;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .section-header:active { opacity: 0.7; }
+
+  .chevron-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 300ms cubic-bezier(0.34, 1.2, 0.64, 1);
+    flex-shrink: 0;
+  }
+  .section.expanded .chevron-icon {
+    transform: rotate(90deg);
+  }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 600;
+    flex: 1;
+    letter-spacing: -0.1px;
+  }
+
+  .section-count {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    padding-right: 4px;
+  }
+
+  .section-content {
+    overflow: hidden;
+    transition: max-height 350ms cubic-bezier(0.34, 1.05, 0.64, 1),
+                opacity 250ms ease;
+    max-height: 0;
+    opacity: 0;
+  }
+  .section.expanded .section-content {
+    max-height: 500px;
+    opacity: 1;
+  }
+
+  .section-items {
+    padding: 2px 0;
+    display: flex;
+    flex-direction: column;
+    background: rgba(248, 244, 238, 0.7);
+    border-radius: 16px;
+    overflow: hidden;
+    margin-bottom: 4px;
+    box-shadow: 0 0.5px 2px rgba(0, 0, 0, 0.03);
+  }
+
+  .item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 400;
+    color: var(--text-primary);
+    letter-spacing: 0.1px;
+    border-bottom: 0.5px solid var(--divider);
+  }
+  .item:last-child { border-bottom: none; }
+  .item-icon {
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    color: var(--icon-color);
+  }
+  .item-icon svg { display: block; }
+
+  /* ===== Bottom Bar ===== */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    padding: 0 16px 16px;
+    padding-bottom: max(16px, var(--safe-bottom));
+    background: linear-gradient(transparent, var(--bg) 30%);
+    z-index: 50;
+  }
+
+  .bottom-bar-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px;
+    background: var(--bottom-bar-bg);
+    border: 1px solid var(--bottom-bar-border);
+    border-radius: 25px;
+    padding: 0 18px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .bar-icon {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    cursor: pointer;
+  }
+  .bar-icon svg { display: block; }
+
+  .bar-text {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--text-secondary);
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <div class="status-bar-left">9:41</div>
+    <div class="status-bar-right">
+      <svg width="18" height="12" viewBox="0 0 18 12" fill="none">
+        <rect x="0" y="7" width="3" height="5" rx="0.8" fill="currentColor"/>
+        <rect x="4.5" y="4.5" width="3" height="7.5" rx="0.8" fill="currentColor"/>
+        <rect x="9" y="2" width="3" height="10" rx="0.8" fill="currentColor"/>
+        <rect x="13.5" y="0" width="3" height="12" rx="0.8" fill="currentColor"/>
+      </svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="none">
+        <path d="M1.2 4.2C3.8 1.5 7.8 1.5 10.4 4.2" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        <path d="M3.2 6.8C4.8 5.2 7.2 5.2 8.8 6.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        <circle cx="6" cy="9.5" r="1.2" fill="currentColor"/>
+      </svg>
+      <svg width="27" height="13" viewBox="0 0 27 13" fill="none">
+        <rect x="0.5" y="0.5" width="23" height="12" rx="3.5" stroke="currentColor" stroke-opacity="0.35" fill="none"/>
+        <rect x="2" y="2" width="20" height="9" rx="2" fill="currentColor"/>
+        <path d="M25 5v3a2 2 0 000-3z" fill="currentColor" fill-opacity="0.4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="header">
+    <div class="avatars">
+      <div class="avatar avatar-1">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5A7A5A" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/>
+        </svg>
+      </div>
+      <div class="avatar avatar-2">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#8A5A4A" stroke-width="1.8" stroke-linecap="round">
+          <circle cx="12" cy="8" r="4"/>
+          <path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/>
+        </svg>
+      </div>
+    </div>
+
+    <button class="header-btn" aria-label="分享">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 14v5a2 2 0 002 2h12a2 2 0 002-2v-5"/>
+        <polyline points="12 3 12 15"/>
+        <polyline points="8 7 12 3 16 7"/>
+      </svg>
+    </button>
+
+    <div class="more-wrapper">
+      <div class="more-morph" id="moreMorph" onclick="toggleMenu(event)">
+        <div class="dots-icon">
+          <span><i></i><i></i><i></i></span>
+        </div>
+        <div class="menu-list">
+          <div class="menu-item" onclick="handleMenuItem(event, '编辑')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 3l4 4L7 21H3v-4L17 3z"/>
+            </svg>
+            编辑
+          </div>
+          <div class="menu-item" onclick="handleMenuItem(event, '置顶')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 17V3"/>
+              <path d="M5 10l7-7 7 7"/>
+              <path d="M3 21h18"/>
+            </svg>
+            置顶
+          </div>
+          <div class="menu-item delete-item" onclick="handleMenuItem(event, '删除')">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
+              <path d="M10 11v6"/>
+              <path d="M14 11v6"/>
+              <path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/>
+            </svg>
+            删除
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="menu-backdrop" id="menuBackdrop" onclick="closeMenu()"></div>
+
+  <!-- Title -->
+  <h1 class="title">阿那亚漫游</h1>
+
+  <!-- Cards -->
+  <div class="cards">
+    <div class="card card-plan">
+      <div class="card-plan-items">
+        <div class="plan-pill checked">
+          <div class="checkbox checked">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
+              <polyline points="3 8 7 12 13 4" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="pill-line"></div>
+        </div>
+        <div class="plan-pill">
+          <div class="checkbox"></div>
+          <div class="pill-line"></div>
+        </div>
+      </div>
+      <div class="card-label">旅行计划</div>
+    </div>
+
+    <div class="card card-tickets">
+      <div class="tickets-icon-wrapper">
+        <div class="tickets-icon">
+          <div class="ticket-doc-back"></div>
+          <div class="ticket-doc">
+            <div class="ticket-line"></div>
+            <div class="ticket-line"></div>
+            <div class="ticket-line"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-label">旅行票据</div>
+    </div>
+  </div>
+
+  <!-- Sections -->
+  <div class="sections">
+
+    <!-- 旅行初稿 - expanded -->
+    <div class="section expanded" data-section>
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="chevron-icon">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="section-title">旅行初稿</span>
+        <span class="section-count">4</span>
+      </div>
+      <div class="section-content">
+        <div class="section-items">
+          <div class="item">
+            <div class="item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                <circle cx="12" cy="9" r="2.5"/>
+              </svg>
+            </div>
+            <span>阿那亚，秦皇岛</span>
+          </div>
+          <div class="item">
+            <div class="item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="9" cy="8" r="3.5"/>
+                <path d="M2 20c0-3 2.5-5.5 7-5.5"/>
+                <circle cx="17" cy="9" r="3"/>
+                <path d="M22 20c0-2.5-2-4.5-5-4.5s-5 2-5 4.5"/>
+              </svg>
+            </div>
+            <span>3人，家庭出行</span>
+          </div>
+          <div class="item">
+            <div class="item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="17" rx="3"/>
+                <path d="M3 9h18"/>
+                <path d="M8 2v4"/>
+                <path d="M16 2v4"/>
+              </svg>
+            </div>
+            <span>5月1日 - 5月5日</span>
+          </div>
+          <div class="item">
+            <div class="item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 000-7.78z"/>
+              </svg>
+            </div>
+            <span>轻松休闲游</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 旅行票据 - collapsed -->
+    <div class="section" data-section>
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="chevron-icon">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="section-title">旅行票据</span>
+        <span class="section-count">8</span>
+      </div>
+      <div class="section-content">
+        <div class="section-items">
+          <div class="item">
+            <div class="item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+            </div>
+            <span>火车票 - 北京→秦皇岛</span>
+          </div>
+          <div class="item">
+            <div class="item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+            </div>
+            <span>酒店预订确认函</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 剪藏 - collapsed -->
+    <div class="section" data-section>
+      <div class="section-header" onclick="toggleSection(this)">
+        <div class="chevron-icon">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+            <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <span class="section-title">剪藏</span>
+        <span class="section-count">3</span>
+      </div>
+      <div class="section-content">
+        <div class="section-items">
+          <div class="item">
+            <div class="item-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z"/>
+              </svg>
+            </div>
+            <span>阿那亚攻略精选</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="bottom-bar">
+    <div class="bottom-bar-inner">
+      <div class="bar-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="3"/>
+          <circle cx="7" cy="10" r="1" fill="currentColor" stroke="none"/>
+          <circle cx="12" cy="10" r="1" fill="currentColor" stroke="none"/>
+          <circle cx="17" cy="10" r="1" fill="currentColor" stroke="none"/>
+          <circle cx="7" cy="14" r="1" fill="currentColor" stroke="none"/>
+          <circle cx="12" cy="14" r="1" fill="currentColor" stroke="none"/>
+          <circle cx="17" cy="14" r="1" fill="currentColor" stroke="none"/>
+        </svg>
+      </div>
+      <span class="bar-text">按住说话</span>
+      <div class="bar-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2l1.5 4.5L18 8l-4.5 1.5L12 14l-1.5-4.5L6 8l4.5-1.5L12 2z"/>
+          <path d="M18 14l1 3 3 1-3 1-1 3-1-3-3-1 3-1 1-3z"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ===== Section Toggle =====
+  function toggleSection(header) {
+    const section = header.closest('[data-section]');
+    section.classList.toggle('expanded');
+  }
+
+  // ===== More Menu Morph =====
+  let menuOpen = false;
+
+  function toggleMenu(e) {
+    e.stopPropagation();
+    if (menuOpen) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  }
+
+  function openMenu() {
+    menuOpen = true;
+    const morph = document.getElementById('moreMorph');
+    const backdrop = document.getElementById('menuBackdrop');
+    morph.classList.add('expanded');
+    backdrop.classList.add('active');
+  }
+
+  function closeMenu() {
+    if (!menuOpen) return;
+    menuOpen = false;
+    const morph = document.getElementById('moreMorph');
+    const backdrop = document.getElementById('menuBackdrop');
+
+    // Phase 1: fade out menu items
+    morph.classList.add('closing');
+
+    // Phase 2: shrink after items fade
+    setTimeout(() => {
+      morph.classList.remove('expanded');
+      morph.classList.remove('closing');
+      backdrop.classList.remove('active');
+    }, 120);
+  }
+
+  function handleMenuItem(e, action) {
+    e.stopPropagation();
+    closeMenu();
+    // Could dispatch custom events here
+  }
+</script>
+</body>
+</html>

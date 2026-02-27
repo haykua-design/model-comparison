@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>模型代码生成对比</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="header">
+    <h1 class="header-title">模型代码生成对比</h1>
+    <div class="header-actions">
+      <label class="blind-toggle">
+        <input type="checkbox" id="blindMode">
+        <span>盲测模式</span>
+      </label>
+      <div class="device-toggle" id="deviceToggle">
+        <button class="device-btn active" data-device="desktop" title="网页端">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </button>
+        <button class="device-btn" data-device="mobile" title="手机端">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg>
+        </button>
+      </div>
+      <button class="btn-compare" id="toggleCompare">并排对比</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <nav class="sidebar" id="sidebar"></nav>
+
+    <main class="main">
+      <div class="model-tabs" id="modelTabs"></div>
+
+      <div class="iframe-area" id="iframeArea">
+        <div class="iframe-wrapper" id="iframeWrapper1">
+          <div class="iframe-label" id="iframeLabel1"></div>
+          <iframe id="iframe1" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals allow-downloads"></iframe>
+          <div class="iframe-placeholder" id="placeholder1">
+            <p>暂无内容</p>
+            <p class="placeholder-hint">请将生成的 HTML 文件放入对应目录，或在 config.js 中配置平台链接</p>
+          </div>
+        </div>
+        <div class="iframe-wrapper hidden" id="iframeWrapper2">
+          <div class="iframe-label" id="iframeLabel2"></div>
+          <iframe id="iframe2" sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-modals allow-downloads"></iframe>
+          <div class="iframe-placeholder" id="placeholder2">
+            <p>暂无内容</p>
+            <p class="placeholder-hint">请将生成的 HTML 文件放入对应目录</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="info-bar" id="infoBar">
+        <div class="info-bar-header" id="infoToggle">
+          <span class="info-bar-title">Prompt & 关注点</span>
+          <span class="info-bar-arrow" id="infoArrow">▼</span>
+        </div>
+        <div class="info-bar-content" id="infoContent">
+          <div class="info-prompt">
+            <span class="info-label">Prompt</span>
+            <p id="promptText"></p>
+          </div>
+          <div class="info-focus">
+            <span class="info-label">关注点</span>
+            <div class="focus-list" id="focusList"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

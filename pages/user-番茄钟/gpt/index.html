@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#0b1220" />
+    <title>番茄钟</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="bg"></div>
+    <main class="app" aria-label="番茄钟">
+      <header class="header">
+        <div class="brand">
+          <div class="logo" aria-hidden="true"></div>
+          <div>
+            <h1>番茄钟</h1>
+            <p class="sub">可自定义工作/休息时间 · 到点提醒</p>
+          </div>
+        </div>
+        <div class="status" id="statusPill" role="status" aria-live="polite">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="modeLabel">工作中</span>
+        </div>
+      </header>
+
+      <section class="card timer-card" aria-label="计时器">
+        <div class="timer">
+          <svg class="ring" viewBox="0 0 120 120" aria-hidden="true">
+            <defs>
+              <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="var(--ring-a)" />
+                <stop offset="1" stop-color="var(--ring-b)" />
+              </linearGradient>
+              <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+                <feGaussianBlur stdDeviation="3" result="blur" />
+                <feColorMatrix
+                  in="blur"
+                  type="matrix"
+                  values="
+                    1 0 0 0 0
+                    0 1 0 0 0
+                    0 0 1 0 0
+                    0 0 0 .55 0"
+                />
+                <feMerge>
+                  <feMergeNode />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+            </defs>
+            <circle class="ring-track" cx="60" cy="60" r="52" />
+            <circle
+              class="ring-progress"
+              cx="60"
+              cy="60"
+              r="52"
+              stroke="url(#grad)"
+              filter="url(#softGlow)"
+              pathLength="100"
+            />
+          </svg>
+
+          <div class="time">
+            <div class="big" id="timeText" aria-label="剩余时间">25:00</div>
+            <div class="small" id="cycleText" aria-label="循环信息">第 1 轮</div>
+          </div>
+        </div>
+
+        <div class="controls" aria-label="控制">
+          <button class="btn primary" id="startPauseBtn" type="button">
+            <span class="icon" aria-hidden="true" id="startPauseIcon">▶</span>
+            <span id="startPauseText">开始</span>
+          </button>
+          <button class="btn" id="resetBtn" type="button" title="重置">
+            <span class="icon" aria-hidden="true">↺</span>
+            重置
+          </button>
+          <button class="btn" id="skipBtn" type="button" title="切换工作/休息">
+            <span class="icon" aria-hidden="true">⇄</span>
+            切换
+          </button>
+        </div>
+
+        <div class="row" aria-label="快捷">
+          <button class="chip" id="setWorkModeBtn" type="button">工作</button>
+          <button class="chip" id="setRestModeBtn" type="button">休息</button>
+          <span class="hint" id="hintText">提示：可在下方设置时长</span>
+        </div>
+      </section>
+
+      <section class="card settings-card" aria-label="设置">
+        <div class="settings-header">
+          <h2>设置</h2>
+          <div class="right">
+            <button class="btn ghost" id="notifyBtn" type="button">
+              <span class="icon" aria-hidden="true">🔔</span>
+              开启通知
+            </button>
+          </div>
+        </div>
+
+        <form class="settings" id="settingsForm">
+          <div class="grid">
+            <label class="field">
+              <span>工作（分钟）</span>
+              <input
+                id="workMinutes"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                type="number"
+                min="1"
+                max="180"
+                step="1"
+                value="25"
+                required
+              />
+            </label>
+            <label class="field">
+              <span>休息（分钟）</span>
+              <input
+                id="restMinutes"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                type="number"
+                min="1"
+                max="60"
+                step="1"
+                value="5"
+                required
+              />
+            </label>
+            <label class="field">
+              <span>长休息（分钟）</span>
+              <input
+                id="longRestMinutes"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                type="number"
+                min="1"
+                max="90"
+                step="1"
+                value="15"
+                required
+              />
+            </label>
+            <label class="field">
+              <span>每几轮长休息</span>
+              <input
+                id="longRestEvery"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                type="number"
+                min="2"
+                max="12"
+                step="1"
+                value="4"
+                required
+              />
+            </label>
+          </div>
+
+          <div class="toggles">
+            <label class="toggle">
+              <input id="autoSwitch" type="checkbox" checked />
+              <span>到点自动切换工作/休息</span>
+            </label>
+            <label class="toggle">
+              <input id="autoStartNext" type="checkbox" />
+              <span>切换后自动开始</span>
+            </label>
+            <label class="toggle">
+              <input id="soundOn" type="checkbox" checked />
+              <span>声音提醒</span>
+            </label>
+            <label class="toggle">
+              <input id="flashTitle" type="checkbox" checked />
+              <span>标题闪烁提醒</span>
+            </label>
+          </div>
+
+          <div class="actions">
+            <button class="btn" id="saveBtn" type="submit">
+              <span class="icon" aria-hidden="true">💾</span>
+              保存设置
+            </button>
+            <span class="note" id="noteText">
+              通知需要浏览器权限；尽量保持此页打开。
+            </span>
+          </div>
+        </form>
+      </section>
+
+      <footer class="footer">
+        <span>快捷键：空格 开始/暂停 · R 重置 · S 切换</span>
+      </footer>
+    </main>
+
+    <dialog class="modal" id="doneDialog" aria-label="计时完成">
+      <div class="modal-card">
+        <div class="modal-title" id="doneTitle">时间到</div>
+        <div class="modal-body" id="doneBody">休息一下吧。</div>
+        <div class="modal-actions">
+          <button class="btn primary" id="doneOkBtn" type="button">知道了</button>
+          <button class="btn" id="doneStartBtn" type="button">开始下一段</button>
+        </div>
+      </div>
+    </dialog>
+
+    <script src="./app.js"></script>
+  </body>
+</html>

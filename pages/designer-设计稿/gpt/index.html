@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#F4EEE7" />
+    <title>笔记详情页（旅行）</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <main class="stage" aria-label="笔记详情页原型">
+      <section class="phone" aria-label="设备预览">
+        <div class="statusbar" aria-hidden="true">
+          <div class="sb-left">9:41</div>
+          <div class="sb-right">
+            <span class="sb-signal"></span>
+            <span class="sb-wifi"></span>
+            <span class="sb-battery"></span>
+          </div>
+        </div>
+
+        <div class="page" id="page">
+          <header class="top">
+            <div class="top-actions">
+              <div class="avatar-stack" aria-label="协作成员（占位）">
+                <div class="avatar a1" aria-hidden="true"></div>
+                <div class="avatar a2" aria-hidden="true"></div>
+              </div>
+
+              <button class="circle-btn" type="button" aria-label="分享（占位）">
+                <span class="icon-placeholder share" aria-hidden="true"></span>
+              </button>
+
+              <div class="more" id="more" data-open="false">
+                <button class="circle-btn more-trigger" id="moreTrigger" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="更多">
+                  <span class="dots" aria-hidden="true">···</span>
+                </button>
+
+                <div class="more-surface" id="moreSurface" aria-hidden="true">
+                  <div class="more-items" role="menu" aria-label="更多操作">
+                    <button class="menu-item" role="menuitem" type="button">编辑</button>
+                    <button class="menu-item" role="menuitem" type="button">置顶</button>
+                    <button class="menu-item danger" role="menuitem" type="button">删除</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h1 class="title">阿那亚漫游</h1>
+          </header>
+
+          <section class="quick" aria-label="快捷入口">
+            <div class="quick-card plan" role="button" aria-label="旅行计划（占位）">
+              <div class="plan-toggles" aria-hidden="true">
+                <div class="toggle-row">
+                  <span class="check on"></span>
+                </div>
+                <div class="toggle-row">
+                  <span class="check off"></span>
+                </div>
+              </div>
+              <div class="quick-label">旅行计划</div>
+            </div>
+
+            <div class="quick-card tickets" role="button" aria-label="旅行票据（占位）">
+              <div class="doc-stack" aria-hidden="true">
+                <div class="doc d1"></div>
+                <div class="doc d2"></div>
+              </div>
+              <div class="quick-label">旅行票据</div>
+            </div>
+          </section>
+
+          <section class="groups" aria-label="分组列表">
+            <article class="group" data-open="true" id="groupDraft">
+              <button class="group-head" type="button" aria-expanded="true">
+                <span class="chev" aria-hidden="true"></span>
+                <span class="group-name">旅行初稿</span>
+                <span class="count" aria-label="条目数">4</span>
+              </button>
+              <div class="group-inner">
+                <div class="group-body">
+                  <div class="pill">
+                    <span class="pill-ic loc" aria-hidden="true"></span>
+                    <span class="pill-text">阿那亚，秦皇岛</span>
+                  </div>
+                  <div class="pill">
+                    <span class="pill-ic people" aria-hidden="true"></span>
+                    <span class="pill-text">3人，家庭出行</span>
+                  </div>
+                  <div class="pill">
+                    <span class="pill-ic cal" aria-hidden="true"></span>
+                    <span class="pill-text">5月1日 - 5月5日</span>
+                  </div>
+                  <div class="pill">
+                    <span class="pill-ic heart" aria-hidden="true"></span>
+                    <span class="pill-text">轻松休闲游</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="group" data-open="false" id="groupTickets">
+              <button class="group-head" type="button" aria-expanded="false">
+                <span class="chev" aria-hidden="true"></span>
+                <span class="group-name">旅行票据</span>
+                <span class="count" aria-label="条目数">8</span>
+              </button>
+              <div class="group-inner">
+                <div class="group-body">
+                  <div class="pill muted">
+                    <span class="pill-ic file" aria-hidden="true"></span>
+                    <span class="pill-text">（占位）机票 / 酒店 / 餐厅…</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+
+            <article class="group" data-open="false" id="groupClips">
+              <button class="group-head" type="button" aria-expanded="false">
+                <span class="chev" aria-hidden="true"></span>
+                <span class="group-name">剪藏</span>
+                <span class="count" aria-label="条目数">3</span>
+              </button>
+              <div class="group-inner">
+                <div class="group-body">
+                  <div class="pill muted">
+                    <span class="pill-ic clip" aria-hidden="true"></span>
+                    <span class="pill-text">（占位）网页 / 截图 / 文章…</span>
+                  </div>
+                </div>
+              </div>
+            </article>
+          </section>
+
+          <div class="voice-spacer" aria-hidden="true"></div>
+
+          <footer class="voice" aria-label="语音输入栏（占位）">
+            <button class="voice-ic" type="button" aria-label="输入方式（占位）">
+              <span class="kbd" aria-hidden="true"></span>
+            </button>
+            <div class="voice-text">按住说话</div>
+            <button class="voice-ic right" type="button" aria-label="更多能力（占位）">
+              <span class="spark" aria-hidden="true"></span>
+            </button>
+          </footer>
+
+          <button class="outside-overlay" id="outsideOverlay" type="button" aria-label="关闭菜单" hidden></button>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>
+

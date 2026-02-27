@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Premium Tomato | 极简番茄钟</title>
+    <link rel="stylesheet" href="./style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="sound-toggle" id="soundToggle">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+        </div>
+
+        <div class="type-selector">
+            <button class="type-button active" data-type="work">工作中</button>
+            <button class="type-button" data-type="break">休息</button>
+        </div>
+
+        <div class="timer-display">
+            <svg class="progress-ring" width="280" height="280">
+                <circle class="progress-ring__circle" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent" r="130" cx="140" cy="140"/>
+                <circle id="progressCircle" class="progress-ring__circle" stroke-width="8" fill="transparent" r="130" cx="140" cy="140"/>
+            </svg>
+            <div class="timer-text" id="timerText">25:00</div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-primary" id="startBtn">开始</button>
+            <button class="btn" id="resetBtn">重置</button>
+        </div>
+
+        <div class="settings">
+            <div class="setting-item">
+                <label>工作时长 (分)</label>
+                <input type="number" id="workDuration" value="25" min="1" max="60">
+            </div>
+            <div class="setting-item">
+                <label>休息时长 (分)</label>
+                <input type="number" id="breakDuration" value="5" min="1" max="60">
+            </div>
+            <div class="notification-toggle">
+                <span>浏览器提醒</span>
+                <input type="checkbox" id="notifyCheck" checked>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="./main.js"></script>
+</body>
+</html>
